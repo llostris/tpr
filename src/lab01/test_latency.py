@@ -12,7 +12,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
 def usage_info():
-    print 'Usage: ./test_comm.py [msg size] [standard/synchronous] [iterations per test] [number of tests]'
+    print 'Usage: ./test_comm.py [standard/synchronous] [size] [iterations per test] [number of tests]'
     print 'Two last arguments aren\'t required'
     sys.exit(-1)
 
@@ -44,8 +44,9 @@ def save_result(result):
 if len(sys.argv) < 2 :
     usage_info()
 
-package_size = int(sys.argv[1])
-comm_type = sys.argv[2]
+package_size = 100
+# package_size = int(sys.argv[1])
+comm_type = sys.argv[1]
 if len(sys.argv) > 3 :
     ITERATIONS = int(sys.argv[3])
 if len(sys.argv) > 4 :
