@@ -4,7 +4,7 @@ from mpi4py import MPI
 import sys
 import numpy
 
-ITERATIONS = 10000
+ITERATIONS = 1000
 RUNS = 100
 # comm_type = 'standard'
 
@@ -12,7 +12,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
 def usage_info():
-    print 'Usage: ./test_comm.py [size] [standard/synchronous] [iterations per test] [number of tests]'
+    print 'Usage: ./test_comm.py [msg size] [standard/synchronous] [iterations per test] [number of tests]'
     print 'Two last arguments aren\'t required'
     sys.exit(-1)
 
@@ -77,10 +77,6 @@ for _ in xrange(RUNS):
 
         rankOne(buffer, package_size)
 
-    else :
-        print "Expected only two nodes"
-
 if rank == 0 :
     latency = total_delay / RUNS * 1e3  # in miliseconds
-    print 'latency python', package_size, comm_type, ITERATIONS, RUNS
-    print latency
+    print 'python latency', package_size, comm_type, latency
