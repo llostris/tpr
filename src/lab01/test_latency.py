@@ -82,5 +82,5 @@ for _ in xrange(RUNS):
 
 if rank == 0 :
     latency = total_delay / RUNS * 1e3  # in miliseconds
-    print 'latency python', package_size, comm_type, ITERATIONS, RUNS, ' : ', latency
-    # save_result(latency)
+    print 'latency python', package_size, comm_type, ITERATIONS, RUNS
+    print latency
