@@ -44,6 +44,9 @@ if len(sys.argv) < 3 :
 
 package_size = int(sys.argv[1])
 comm_type = sys.argv[2]
+if comm_type != 'standard' and comm_type != 'synchronous':
+    usage_info()
+
 buffer = numpy.arange(package_size, dtype='b')
 if len(sys.argv) > 3 :
     ITERATIONS = int(sys.argv[3])

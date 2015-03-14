@@ -45,8 +45,11 @@ if len(sys.argv) < 2 :
     usage_info()
 
 package_size = 100
-# package_size = int(sys.argv[1])
 comm_type = sys.argv[1]
+if comm_type != 'standard' and comm_type != 'synchronous':
+    usage_info()
+if len(sys.argv) > 2 :
+    package_size = int(sys.argv[2])
 if len(sys.argv) > 3 :
     ITERATIONS = int(sys.argv[3])
 if len(sys.argv) > 4 :
