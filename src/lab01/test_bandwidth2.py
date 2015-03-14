@@ -6,29 +6,29 @@ import numpy
 
 TESTS = 100
 ITERATIONS = 10000
-BANDWIDTH_FACTOR = 8.0 / (1024 * 1024)
 STEP = 1000
+BANDWIDTH_FACTOR = 8.0 / (1024 * 1024)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
 def usage_info():
-    print 'Usage: ./test_comm.py [max size] [standard/synchronous] [tests] [step size]'
+    print 'Usage: ./test_comm.py [max size] [standard/synchronous] [iterations] [tests] [step size]'
     print 'Requirements: Step size < max size'
     sys.exit(-1)
 
 def sendMessageStandard(buffer, buffer_size):
-    for i in xrange(ITERATIONS / buffer_size):  # scale the number of iterations s
+    for i in xrange(ITERATIONS):  # scale the number of iterations s
         comm.Send(buffer[:buffer_size], dest = 1)
         comm.Recv(buffer[:buffer_size], source = 1)
 
 def sendMessageSynchronized(buffer, buffer_size):
-    for i in xrange(ITERATIONS / buffer_size):
+    for i in xrange(ITERATIONS):
         comm.Ssend(buffer[:buffer_size], dest = 1)
         comm.Recv(buffer[:buffer_size], source = 1)
 
 def receiveMessages(buffer, buffer_size):
-    for i in xrange(ITERATIONS / buffer_size):
+    for i in xrange(ITERATIONS):
         status = MPI.Status()
         comm.Recv(buffer[:buffer_size], source = 0, status = status)
         if comm_type == 'standard':
@@ -48,15 +48,17 @@ def print_results(results):
 if len(sys.argv) < 3 :
     usage_info()
 
-package_size = int(sys.argv[1]) + 1
+package_size = int(sys.argv[1]) + 1 # added one so all loops will include the max package size
 comm_type = sys.argv[2]
-ITERATIONS = package_size
-if len(sys.argv) > 3 :
-    TESTS = int(sys.argv[3])
-if len(sys.argv) > 4 :
-    STEP = int(sys.argv[4])
-
 buffer = numpy.arange(package_size, dtype='b')
+if len(sys.argv) > 3 :
+    ITERATIONS = int(sys.argv[3])
+if len(sys.argv) > 4 :
+    TESTS = int(sys.argv[4])
+if len(sys.argv) > 5 :
+    STEP = int(sys.argv[5])
+
+total_delay = 0
 bandwidth_sum = {}
 for i in xrange(STEP, package_size, STEP):
     bandwidth_sum[i] = 0
@@ -81,7 +83,7 @@ for _ in xrange(TESTS):
             # gather statistics
             time = time_end - time_start
             try:
-                bandwidth = ITERATIONS * 1.0 / time
+                bandwidth = ITERATIONS * size * 1.0 / time
                 bandwidth *= 2
                 bandwidth_sum[size] += bandwidth * BANDWIDTH_FACTOR
             except ZeroDivisionError:
