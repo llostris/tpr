@@ -9,7 +9,6 @@ __author__ = 'Magda'
 
 TESTS = 100
 ITERATIONS = 100
-BUFFER_SIZE = 10
 
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
@@ -18,29 +17,31 @@ root_ID = 0
 
 
 def usage_info():
-    print 'Usage: ./broadcast.py [buffer_size]'
+    print 'Usage: ./scatter.py [package_size]'
 
 
-def broadcast(buffer, root = root_ID):
+def scatter(buffer, root = 0):
     if rank == root:
+        index = 0
         for proc_id in xrange(1, size):
-            comm.Send(buffer, dest = proc_id)
-        return buffer
+            comm.Send(buffer[index:index + 1], dest = proc_id)
+            index += 1
+        return buffer[root:root + 1]
     else:
         return comm.Recv(buffer, source = root)
 
 
-def print_result(result, result_my):
-    print 'python broadcast', result_my, result
+def print_result(result_mpi, result_my):
+    print 'python broadcast', result_my, result_mpi
 
 # read arguments
 
 if len(sys.argv) < 2:
     usage_info()
 
-BUFFER_SIZE = int(sys.argv[1])
+package_size = int(sys.argv[1])
 
-buffer = numpy.arange(BUFFER_SIZE, dtype='b')
+buffer = numpy.ndarray(shape=(size, package_size), dtype='b')
 time_my = 0
 time_mpi = 0
 start_time = 0
@@ -56,7 +57,7 @@ for _ in xrange(TESTS):
 
     for i in xrange(ITERATIONS):
         timer.start()
-        comm.bcast(buffer, root = root_ID)
+        comm.scatter(buffer)
         comm.Barrier()    # wait until all complete
         timer.end()
         if rank == 0:
@@ -68,7 +69,7 @@ for _ in xrange(TESTS):
 
     for j in xrange(ITERATIONS):
         timer.start()
-        broadcast(buffer)
+        scatter(buffer)
         comm.Barrier()    # wait until all complete
         timer.end()
         if rank == 0:
