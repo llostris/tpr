@@ -32,7 +32,7 @@ def scatter(buffer, root = 0):
 
 
 def print_result(result_mpi, result_my):
-    print 'python broadcast', result_my, result_mpi
+    print 'python scatter', result_my, result_mpi
 
 # read arguments
 
