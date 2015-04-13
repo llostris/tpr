@@ -55,25 +55,25 @@ for _ in xrange(TESTS):
 
     # MPI implementation
 
+    timer.start()
     for i in xrange(ITERATIONS):
-        timer.start()
         comm.scatter(buffer)
         comm.Barrier()    # wait until all complete
-        timer.end()
-        if rank == 0:
-            time_mpi += timer.get_result()
+    timer.end()
+    if rank == 0:
+        time_mpi += timer.get_result()
 
     comm.Barrier()
 
     # my implementation
 
+    timer.start()
     for j in xrange(ITERATIONS):
-        timer.start()
         scatter(buffer)
         comm.Barrier()    # wait until all complete
-        timer.end()
-        if rank == 0:
-            time_my += timer.get_result()
+    timer.end()
+    if rank == 0:
+        time_my += timer.get_result()
 
 if rank == 0:
     time_my = time_my / TESTS * 1e3

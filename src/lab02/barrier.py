@@ -19,13 +19,12 @@ def print_result(result):
 timer = Timer(rank)
 time = 0
 
+timer.start()
 for _ in xrange(TESTS):
     comm.Barrier()
-    timer.start()
-    comm.Barrier()
-    timer.end()
-    if rank == 0:
-        time += timer.get_result()
+timer.end()
+if rank == 0:
+    time += timer.get_result()
 
 if rank == 0:
     time = time * 1.0 / TESTS * 1e3     # miliseconds

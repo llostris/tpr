@@ -118,7 +118,7 @@ def plot_metrics(data, prefix):
             # print nodes, times
 
             time_old = times[0]
-            # time_old = sequential_time[size]
+            time_old = sequential_time[size]
             for time_new in times[1:]:
                 data_speedup.append(speedup(time_old, time_new))
 
@@ -150,6 +150,8 @@ def load_data(datafile):
             if len(line.strip()) > 0:
                 splitted = line.split()
                 arr = [ splitted[0], int(splitted[1]), int(splitted[2]), float(splitted[3]), float(splitted[4]) ]
+                # first data format: type, pi, points, time, nodes -> remap
+                # arr = [ splitted[0], int(splitted[2]), int(splitted[4]), float(splitted[3]), float(splitted[1]) ]
                 data.append(arr)
         f.close()
     return data
@@ -175,10 +177,10 @@ if __name__ == "__main__":
     plot_metrics(data_parallel, 'reg')
 
     # scaled
-    data_scaled = load_data('results-scaled.txt')
+    data_scaled = load_data('results-scaled2.txt')
     for line in data_scaled:
         line[1] = line[1] / line[2]
-    print data_scaled
+    # print data_scaled
     plot_time_parallel(data_scaled, 'scaled')
     plot_time_processes(data_scaled, 'scaled')
     fix_scaled_times(data_scaled)
