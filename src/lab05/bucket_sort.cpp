@@ -5,8 +5,12 @@
 #include <algorithm>
 #include <omp.h>
 #include <ctime>
+#include <cstring>
 
 using namespace std;
+
+int parallelism_enabled = 0;
+int num_threads = 1;
 
 double parallel_section_time = 0.0;
 double linear_section_time = 0.0;
@@ -42,9 +46,9 @@ void bucketSort(float* tab, int n) {
   time_start = clock();
 
   int id;
-  #pragma omp parallel for private(i, id) schedule(dynamic)
+  #pragma omp parallel for private(i, id) schedule(runtime) num_threads(num_threads)
   for ( int i = 0; i < buckets_num; i++ ) {
-//    id = omp_get_thread_num(); 
+//    id = omp_get_thread_num();
 //    printf("Iteracja %d wykonana przez watek nr. %d.\n", i, id);
     sort(buckets[i].begin(), buckets[i].end());
   }
@@ -71,12 +75,27 @@ void bucketSort(float* tab, int n) {
 
 int main(int argc, char** argv) {
 
-  if ( argc < 2 ) {
-    cout << "Invalid call. Usage: ./bucket_sort numbers_in_array buckets\n";
+  if ( argc < 4 ) {
+    cout << "Invalid call. Usage: ./bucket_sort numbers_in_array number_of_threads [static|dynamic|guided] [chunk_size]\n";
     return -1;
   }
 
   int n = atoi(argv[1]);
+  char* sched_type_name = argv[3];
+  num_threads = atoi(argv[2]);
+
+  int chunk = 0;  
+  if ( argc == 5 ) {
+    chunk = atoi(argv[4]);
+  }
+  cout << chunk << "\n";
+  if ( strcmp(sched_type_name, "static") == 0 ) {
+    omp_set_schedule(omp_sched_static, chunk); 
+  } else if ( strcmp(sched_type_name, "dynamic") == 0 ) {
+    omp_set_schedule(omp_sched_dynamic, chunk);
+  } else if ( strcmp(sched_type_name, "guided") == 0 ) {
+    omp_set_schedule(omp_sched_guided, chunk);
+  }
 
   // generate tab
   float* tab = new float[n];
@@ -93,22 +112,3 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-float findMin(float* tab, int n) {
-  int min = tab[0];
-  for ( int i = 1; i < n; i++ ) {
-    if ( tab[i] < min ) {
-      min = tab[i];
-    }
-  }
-  return min;
-}
-
-float findMax(float* tab, int n) {
-  int max = tab[0];
-  for ( int i = 1; i < n; i++ ) {
-    if ( tab[i] > max ) {
-      max = tab[i];
-    }
-  }
-  return max;
-}
