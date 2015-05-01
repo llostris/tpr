@@ -7,6 +7,7 @@
 #include <ctime>
 #include <cstring>
 
+
 using namespace std;
 
 int parallelism_enabled = 0;
@@ -30,10 +31,13 @@ void bucketSort(float* tab, int n) {
   time_start = clock();
   
   vector<float>* buckets = new vector<float>[n];
-  int buckets_num = n;
+  int buckets_num = n / 100;
+  if ( buckets_num == 0 ) {
+    buckets_num = n;
+  }
 
   for ( int i = 0; i < n; i++ ) {
-    int bucket_nr = n * tab[i];
+    int bucket_nr = buckets_num * tab[i];
 //    cout << bucket_nr << " " << tab[i] << "\n";
     buckets[bucket_nr].push_back(tab[i]);
   }
